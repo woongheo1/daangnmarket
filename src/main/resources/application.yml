@@ -1,14 +1,21 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/daangn_db
+    url: jdbc:mysql://localhost:3306/daangn_db?useSSL=false&serverTimezone=Asia/Seoul
     username: root
     password: admin1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
+    open-in-view: false  # <- 💡 권장: Lazy 로딩 문제 방지
     hibernate:
-      ddl-auto: update
+      ddl-auto: update    # 운영에서는 validate로 변경 추천
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: true  # SQL을 예쁘게 출력
+        dialect: org.hibernate.dialect.MySQL8Dialect  # 💡 명시해주는 게 좋음
+
+  # 필요 시 콘솔 컬러 출력 (선택)
+  output:
+    ansi:
+      enabled: always
