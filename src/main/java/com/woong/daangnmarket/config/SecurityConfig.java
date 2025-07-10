@@ -22,11 +22,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())  // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/members/signup").permitAll()
+                        .requestMatchers("/api/members/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                //.formLogin(form -> form.disable()); // 비활성화
-                  .formLogin(withDefaults()); // 기본 로그인 폼 활성화
+                .formLogin(form -> form.disable()); // 비활성화
+
 
         return http.build();
     }
