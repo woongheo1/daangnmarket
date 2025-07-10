@@ -23,4 +23,6 @@ spring:
 jwt:
   secret: myVerySecretKeyThatIsAtLeast32BytesLong1234!
 
-
+redis:
+    host: localhost
+    port: 6379
