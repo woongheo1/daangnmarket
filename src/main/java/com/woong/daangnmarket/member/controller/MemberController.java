@@ -1,5 +1,7 @@
 package com.woong.daangnmarket.member.controller;
 
+import com.woong.daangnmarket.member.dto.LoginRequest;
+import com.woong.daangnmarket.member.dto.LoginResponse;
 import com.woong.daangnmarket.member.dto.SignUpRequest;
 import com.woong.daangnmarket.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -22,4 +24,10 @@ public class MemberController {
         memberService.signUp(request);
         return ResponseEntity.ok().build();
     }
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
+        LoginResponse response = memberService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
 }
