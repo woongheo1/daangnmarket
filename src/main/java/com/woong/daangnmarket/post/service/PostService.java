@@ -12,6 +12,8 @@ import com.woong.daangnmarket.post.dto.PostRequest;
 import com.woong.daangnmarket.post.dto.PostResponse;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,5 +55,11 @@ public class PostService {
 
         // 응답 DTO 반환
         return new PostResponse(saved);
+    }
+    //  전체 게시글 목록 조회 (페이징)
+    @Transactional(readOnly = true)
+    public Page<PostResponse> getAllPosts(Pageable pageable) {
+        return postRepository.findAllByRemovedFalse(pageable)
+                .map(PostResponse::new);
     }
 }
