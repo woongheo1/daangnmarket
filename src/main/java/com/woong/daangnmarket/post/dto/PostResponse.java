@@ -31,4 +31,9 @@ public class PostResponse {
         this.categoryId = post.getCategory() != null ? post.getCategory().getId() : null;
         this.createdAt = post.getCreatedAt();
     }
+    //  정적 팩토리 메서드 추가
+    public static PostResponse from(Post post) {
+        return new PostResponse(post);
+    }
+
 }

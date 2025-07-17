@@ -2,7 +2,7 @@ package com.woong.daangnmarket.post.controller;
 
 import com.woong.daangnmarket.post.dto.PostRequest;
 import com.woong.daangnmarket.post.dto.PostResponse;
-import com.woong.daangnmarket.post.service.PostService;
+import com.woong.daangnmarket.post.service.PostServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    private final PostService postService;
+    private final PostServiceImpl postServiceImpl;
 
     /**
      * 게시글 등록 API
@@ -28,13 +28,20 @@ public class PostController {
      */
     @PostMapping
     public ResponseEntity<PostResponse> createPost(@RequestBody @Valid PostRequest request) {
-        PostResponse response = postService.createPost(request);
+        PostResponse response = postServiceImpl.createPost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // 게시글 전체 목록 조회 api
     @GetMapping
     public ResponseEntity<Page<PostResponse>> getAllPosts(Pageable pageable) {
-        Page<PostResponse> posts = postService.getAllPosts(pageable);
+        Page<PostResponse> posts = postServiceImpl.getAllPosts(pageable);
         return ResponseEntity.ok(posts);
+    }
+
+    // 특정 게시글 상세 조회 api
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponse> getPostById(@PathVariable("postId") Long postId) {
+        PostResponse response = postServiceImpl.getPostById(postId);
+        return ResponseEntity.ok(response);
     }
 }
