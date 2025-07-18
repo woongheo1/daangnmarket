@@ -5,6 +5,7 @@ import com.woong.daangnmarket.member.domain.Member;
 
 import com.woong.daangnmarket.member.domain.repository.MemberRepository;
 import com.woong.daangnmarket.post.domain.entity.Category;
+import com.woong.daangnmarket.post.domain.entity.Location;
 import com.woong.daangnmarket.post.domain.entity.Post;
 import com.woong.daangnmarket.post.domain.repository.CategoryRepository;
 import com.woong.daangnmarket.post.domain.repository.PostRepository;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +42,15 @@ public class PostServiceImpl {
                     .orElseThrow(() -> new IllegalArgumentException("카테고리 정보가 존재하지 않습니다."));
         }
 
+        // Location 객체 생성 (latitude, longitude 둘 다 있을 때만)
+        Location location = null;
+        if (request.getLatitude() != null && request.getLongitude() != null) {
+            location = Location.builder()
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
+                    .build();
+        }
+
         // 게시글 생성
         Post post = Post.builder()
                 .title(request.getTitle())
@@ -47,6 +59,7 @@ public class PostServiceImpl {
                 .region(request.getRegion())
                 .status(request.getStatus())
                 .imageUrl(request.getImageUrl())
+                .location(location)
                 .member(member)
                 .category(category)
                 .build();
@@ -70,6 +83,14 @@ public class PostServiceImpl {
                 .orElseThrow(() -> new PostNotFoundException("해당 게시글이 없습니다."));
 
         return PostResponse.from(post);
+    }
+    // 위치 기반 메서드 조회
+    @Transactional(readOnly = true)
+    public List<PostResponse> getPostsByLocation(double latitude, double longitude, double radius) {
+        List<Post> posts = postRepository.findPostsByLocationWithinRadius(latitude, longitude, radius);
+        return posts.stream()
+                .map(PostResponse::new)
+                .toList();
     }
 
 }
