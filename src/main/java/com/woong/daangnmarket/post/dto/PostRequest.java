@@ -15,4 +15,6 @@ public class PostRequest {
     private String imageUrl;      // 대표 이미지 URL
     private Long memberId;        // 작성자 ID
     private Long categoryId;      // 카테고리 ID
+    private Double latitude;    //위도
+    private Double longitude;   //경도
 }

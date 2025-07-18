@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 
 @RestController
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostServiceImpl postServiceImpl;
+
 
     /**
      * 게시글 등록 API
@@ -44,4 +46,18 @@ public class PostController {
         PostResponse response = postServiceImpl.getPostById(postId);
         return ResponseEntity.ok(response);
     }
+    // 위치 기반 조회 api
+    @GetMapping("/search")
+    public ResponseEntity<?> search(
+            @RequestParam("lat") double lat,
+            @RequestParam("lon") double lon
+    ) {
+        // 예: 위도, 경도를 기반으로 5km 이내 게시글 조회
+        List<PostResponse> nearbyPosts = postServiceImpl.getPostsByLocation(lat, lon, 5.0); // 반경 5km
+
+        return ResponseEntity.ok(nearbyPosts);
+    }
+
+
+
 }
