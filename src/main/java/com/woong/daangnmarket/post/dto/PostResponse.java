@@ -18,6 +18,8 @@ public class PostResponse {
     private final Long memberId;
     private final Long categoryId;
     private final LocalDateTime createdAt;
+    private final Double latitude;
+    private final Double longitude;
 
     public PostResponse(Post post) {
         this.id = post.getId();
@@ -30,10 +32,18 @@ public class PostResponse {
         this.memberId = post.getMember().getId();
         this.categoryId = post.getCategory() != null ? post.getCategory().getId() : null;
         this.createdAt = post.getCreatedAt();
+
+        if (post.getLocation() != null) {
+            this.latitude = post.getLocation().getLatitude();
+            this.longitude = post.getLocation().getLongitude();
+        } else {
+            this.latitude = null;
+            this.longitude = null;
+        }
     }
-    //  정적 팩토리 메서드 추가
+
+    // 정적 팩토리 메서드
     public static PostResponse from(Post post) {
         return new PostResponse(post);
     }
-
 }

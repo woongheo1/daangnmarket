@@ -49,6 +49,11 @@ public class Post {
     @Column(name = "IS_REMOVED")
     private Boolean removed = false;
 
+    // Location과 1:1 연관관계 (Post가 주인)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "LOCATION_ID")
+    private Location location;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -56,7 +61,7 @@ public class Post {
 
     @Builder
     public Post(String title, String content, Integer price, String region,
-                String status, String imageUrl, Member member, Category category) {
+                String status, String imageUrl, Member member, Category category, Location location) {
         this.title = title;
         this.content = content;
         this.price = price;
@@ -65,6 +70,8 @@ public class Post {
         this.imageUrl = imageUrl;
         this.member = member;
         this.category = category;
+        this.location = location;
+
     }
 
     /**
