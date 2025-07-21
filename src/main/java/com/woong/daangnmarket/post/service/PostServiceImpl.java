@@ -84,6 +84,13 @@ public class PostServiceImpl {
 
         return PostResponse.from(post);
     }
+    // ✅ 카테고리 기반 게시글 조회
+    @Transactional(readOnly = true)
+    public Page<PostResponse> getPostsByCategory(Long categoryId, Pageable pageable) {
+        return postRepository.findByCategoryIdAndRemovedFalse(categoryId, pageable)
+                .map(PostResponse::new);
+    }
+
     // 위치 기반 메서드 조회
     @Transactional(readOnly = true)
     public List<PostResponse> getPostsByLocation(double latitude, double longitude, double radius) {
