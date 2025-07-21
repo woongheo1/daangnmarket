@@ -17,6 +17,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.id = :postId AND p.removed = false")
     public Optional<Post> findPostById(Long postId);
 
+    // 카테고리 ID로 게시글 검색 (페이징 처리 포함)
+    Page<Post> findByCategoryIdAndRemovedFalse(Long categoryId, Pageable pageable);
+
     // soft delete 처리된 게시글 제외하고 조회
     Page<Post> findAllByRemovedFalse(Pageable pageable);
     // 위치 기반 게시글 조회 - native query (반경 내 게시글 찾기)
