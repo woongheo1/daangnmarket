@@ -73,6 +73,18 @@ public class Post {
         this.location = location;
 
     }
+    public void updatePost(String title, String content, Integer price, String region,
+                           String status, String imageUrl, Category category, Location location) {
+        this.title = title;
+        this.content = content;
+        this.price = price;
+        this.region = region;
+        this.status = status;
+        this.imageUrl = imageUrl;
+        this.category = category;
+        this.location = location;
+    }
+
 
     /**
      * 게시글을 소프트 삭제 처리하는 메서드입니다.

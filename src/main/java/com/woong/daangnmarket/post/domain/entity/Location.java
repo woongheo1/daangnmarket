@@ -27,4 +27,9 @@ public class Location {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+    // 좌표 업데이트 메서드 추가
+    public void updateCoordinates(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
