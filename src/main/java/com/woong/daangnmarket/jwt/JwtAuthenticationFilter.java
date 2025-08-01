@@ -28,16 +28,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         log.info("[JwtAuthenticationFilter] 요청 URI: {}", requestURI);
 
-        // 로그아웃 경로는 필터 통과시키기 (블랙리스트 검사 생략)
-        if (requestURI.equals("/api/logout")) {
-            log.info("[JwtAuthenticationFilter] 로그아웃 경로, 필터 통과");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String token = resolveToken(request);
         log.info("[JwtAuthenticationFilter] 추출된 토큰: {}", token);
 
+        // 토큰이 존재하고 유효한 경우에만 인증 처리
         if (token != null && jwtTokenProvider.validateToken(token)) {
             log.info("[JwtAuthenticationFilter] 토큰 유효성 검사 통과");
 
@@ -53,7 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
             log.info("[JwtAuthenticationFilter] 인증 정보 설정 완료: {}", auth.getName());
         } else {
-            log.info("[JwtAuthenticationFilter] 토큰이 없거나 유효하지 않음");
+            // 토큰이 없거나 유효하지 않은 경우, 인증 객체를 설정하지 않고 다음 필터로 진행
+            log.info("[JwtAuthenticationFilter] 토큰이 없거나 유효하지 않음 -> 인증 처리 스킵");
         }
 
         // 다음 필터로 진행
@@ -65,4 +60,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
 }
-

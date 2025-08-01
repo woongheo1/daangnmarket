@@ -1,12 +1,13 @@
+
 package com.woong.daangnmarket.config;
 
 import com.woong.daangnmarket.jwt.JwtAuthenticationFilter;
 import com.woong.daangnmarket.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier; //
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,9 +38,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/members/**", "/api/login", "/api/signup" , "/api/logout" , "/api/posts/**", "/search/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()  // GET 요청만 인증 없이 허용
+                        .requestMatchers("/api/members/**", "/api/login", "/api/signup", "/api/logout", "/search/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+
                 .formLogin(form -> form.disable())
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
