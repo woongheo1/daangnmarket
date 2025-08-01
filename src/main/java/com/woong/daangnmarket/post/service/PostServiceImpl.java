@@ -12,10 +12,13 @@ import com.woong.daangnmarket.post.domain.repository.PostRepository;
 import com.woong.daangnmarket.post.dto.PostRequest;
 import com.woong.daangnmarket.post.dto.PostResponse;
 
+import com.woong.daangnmarket.post.dto.PostUpdateRequest;
 import com.woong.daangnmarket.post.exception.PostNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +26,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PostServiceImpl {
+public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
+
 
     @Transactional
     public PostResponse createPost(PostRequest request) {
@@ -76,6 +80,7 @@ public class PostServiceImpl {
         return postRepository.findAllByRemovedFalse(pageable)
                 .map(PostResponse::new);
     }
+
     // 특정 게시글 조회
     @Transactional(readOnly = true)
     public PostResponse getPostById(Long postId) {
@@ -84,11 +89,64 @@ public class PostServiceImpl {
 
         return PostResponse.from(post);
     }
-    // ✅ 카테고리 기반 게시글 조회
+
+    // 카테고리 기반 게시글 조회
     @Transactional(readOnly = true)
     public Page<PostResponse> getPostsByCategory(Long categoryId, Pageable pageable) {
         return postRepository.findByCategoryIdAndRemovedFalse(categoryId, pageable)
                 .map(PostResponse::new);
+    }
+    // 게시글 수정
+    @Transactional
+    public PostResponse updatePost(Long postId, PostUpdateRequest request) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String currentUserEmail;
+
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+            currentUserEmail = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
+        } else if (principal instanceof String) {
+            currentUserEmail = (String) principal;  // 일반적으로 "anonymousUser"일 수도 있음
+        } else {
+            currentUserEmail = null;  // 예상치 못한 타입 처리
+        }
+
+        System.out.println("현재 인증된 사용자 이메일: " + currentUserEmail);
+
+
+
+        // 작성자인지 확인
+        Member member = post.getMember();
+        if (!member.getEmail().equals(currentUserEmail)) {
+            throw new SecurityException("게시글 작성자만 수정할 수 있습니다.");
+        }
+
+        // 카테고리 조회 (Optional)
+        var category = request.getCategoryId() != null ?
+                categoryRepository.findById(request.getCategoryId()).orElse(null) : null;
+
+        // Location 업데이트 (Optional)
+        Location location = post.getLocation();
+        if (location != null && request.getLatitude() != null && request.getLongitude() != null) {
+            location.updateCoordinates(request.getLatitude(), request.getLongitude());
+        }
+
+        // 게시글 정보 업데이트
+        post.updatePost(
+                request.getTitle(),
+                request.getContent(),
+                request.getPrice(),
+                request.getRegion(),
+                request.getStatus(),
+                request.getImageUrl(),
+                category,
+                location
+        );
+
+        return PostResponse.from(post);
     }
 
     // 위치 기반 메서드 조회
@@ -99,5 +157,6 @@ public class PostServiceImpl {
                 .map(PostResponse::new)
                 .toList();
     }
+
 
 }
