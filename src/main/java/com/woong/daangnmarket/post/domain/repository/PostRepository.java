@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p WHERE p.id = :postId AND p.removed = false")
-    public Optional<Post> findPostById(Long postId);
+    public Optional<Post> findPostById(@Param("postId") Long postId);
 
     // 카테고리 ID로 게시글 검색 (페이징 처리 포함)
     Page<Post> findByCategoryIdAndRemovedFalse(Long categoryId, Pageable pageable);

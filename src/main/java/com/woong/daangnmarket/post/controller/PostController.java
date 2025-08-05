@@ -55,6 +55,12 @@ public class PostController {
         PostResponse response = postService.updatePost(postId, request);
         return ResponseEntity.ok(response);
     }
+    // 게시글 삭제 api
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable("postId") Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
+    }
 
 
     // 위치 기반 조회 api

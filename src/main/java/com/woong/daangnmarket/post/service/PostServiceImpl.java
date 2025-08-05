@@ -84,7 +84,7 @@ public class PostServiceImpl implements PostService {
     // 특정 게시글 조회
     @Transactional(readOnly = true)
     public PostResponse getPostById(Long postId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository. findPostById(postId)
                 .orElseThrow(() -> new PostNotFoundException("해당 게시글이 없습니다."));
 
         return PostResponse.from(post);
@@ -149,6 +149,32 @@ public class PostServiceImpl implements PostService {
         return PostResponse.from(post);
     }
 
+    // 게시글 삭제
+    @Transactional
+    public void deletePost(Long postId) {
+        Post post = postRepository.findPostById(postId)
+                .orElseThrow(() -> new PostNotFoundException("해당 게시글이 없습니다."));
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String currentUserEmail;
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+            currentUserEmail = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
+        } else if (principal instanceof String) {
+            currentUserEmail = (String) principal;
+        } else {
+            currentUserEmail = null;
+        }
+
+        // 작성자인지 검증
+        Member member = post.getMember();
+        if (!member.getEmail().equals(currentUserEmail)) {
+            throw new SecurityException("게시글 작성자만 삭제할 수 있습니다.");
+        }
+
+        // Soft Delete 처리
+        post.removePost();
+    }
     // 위치 기반 메서드 조회
     @Transactional(readOnly = true)
     public List<PostResponse> getPostsByLocation(double latitude, double longitude, double radius) {

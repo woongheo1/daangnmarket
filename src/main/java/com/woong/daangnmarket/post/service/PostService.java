@@ -20,6 +20,7 @@ public interface PostService {
 
     List<PostResponse> getPostsByLocation(double latitude, double longitude, double radius);
 
+    void deletePost(Long postId);
 
 
 
