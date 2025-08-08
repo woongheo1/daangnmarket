@@ -1,6 +1,7 @@
 package com.woong.daangnmarket.post.service;
 
 
+import com.woong.daangnmarket.image.service.ImageService;
 import com.woong.daangnmarket.member.domain.Member;
 
 import com.woong.daangnmarket.member.domain.repository.MemberRepository;
@@ -21,7 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -31,10 +34,16 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageService imageService;
 
 
     @Transactional
-    public PostResponse createPost(PostRequest request) {
+    public PostResponse createPost(PostRequest request, MultipartFile imageFile) throws IOException {
+        String imageUrl = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageUrl = imageService.uploadImage(imageFile);
+        }
+
         // 작성자 조회
         Member member = memberRepository.findById(request.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("작성자 정보가 존재하지 않습니다."));
@@ -62,7 +71,7 @@ public class PostServiceImpl implements PostService {
                 .price(request.getPrice())
                 .region(request.getRegion())
                 .status(request.getStatus())
-                .imageUrl(request.getImageUrl())
+                .imageUrl(imageUrl)  // 요청에서 받은 URL 대신 S3 업로드 URL 사용
                 .location(location)
                 .member(member)
                 .category(category)
