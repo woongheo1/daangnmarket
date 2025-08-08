@@ -11,7 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -29,11 +31,16 @@ public class PostController {
      * @param request 게시글 등록 요청 데이터
      * @return 생성된 게시글 정보(PostResponse)
      */
+    // 게시글 생성
     @PostMapping
-    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid PostRequest request) {
-        PostResponse response = postService.createPost(request);
+    public ResponseEntity<PostResponse> createPost(
+            @RequestPart("post") @Valid PostRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException {
+
+        PostResponse response = postService.createPost(request, imageFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     // 게시글 전체 목록 조회 api
     @GetMapping
     public ResponseEntity<Page<PostResponse>> getAllPosts(Pageable pageable) {
