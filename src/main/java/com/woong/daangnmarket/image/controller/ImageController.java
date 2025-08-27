@@ -26,4 +26,15 @@ public class ImageController {
         String imageUrl = imageService.uploadImage(file);
         return ResponseEntity.ok(imageUrl);
     }
+
+    /**
+     * 이미지 삭제 API
+     * @param imageUrl 삭제할 이미지 URL
+     * @return 성공 메시지
+     */
+    @DeleteMapping
+    public ResponseEntity<String> deleteImage(@RequestParam("imageUrl") String imageUrl) {
+        imageService.deleteImage(imageUrl);
+        return ResponseEntity.ok("Image deleted successfully");
+    }
 }

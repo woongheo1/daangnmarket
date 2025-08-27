@@ -41,4 +41,27 @@ public class S3Uploader {
         // 업로드된 파일 URL 반환
         return amazonS3.getUrl(bucket, fileName).toString();
     }
+
+    /**
+     * S3에서 파일 삭제
+     * @param fileUrl 삭제할 파일의 전체 URL
+     */
+    public void delete(String fileUrl) {
+        String fileName = extractFileNameFromUrl(fileUrl);
+        amazonS3.deleteObject(bucket, fileName);
+    }
+
+    /**
+     * URL에서 파일 이름 추출
+     * @param fileUrl 파일의 전체 URL
+     * @return S3 버킷 내의 파일 이름 (경로 포함)
+     */
+    private String extractFileNameFromUrl(String fileUrl) {
+        try {
+            java.net.URL url = new java.net.URL(fileUrl);
+            return url.getPath().substring(1);
+        } catch (java.net.MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid file URL", e);
+        }
+    }
 }

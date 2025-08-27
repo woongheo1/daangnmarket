@@ -181,6 +181,12 @@ public class PostServiceImpl implements PostService {
             throw new SecurityException("게시글 작성자만 삭제할 수 있습니다.");
         }
 
+        // S3에서 이미지 삭제
+        String imageUrl = post.getImageUrl();
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            imageService.deleteImage(imageUrl);
+        }
+
         // Soft Delete 처리
         post.removePost();
     }
