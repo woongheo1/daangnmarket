@@ -38,10 +38,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()  // GET 요청만 인증 없이 허용
-                        .requestMatchers("/api/members/**", "/api/login", "/api/signup", "/api/logout", "/search/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll() // WebSocket 전체 경로 인증 제외
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                        .requestMatchers("/api/members/**", "/api/login", "/api/signup", "/api/logout", "/search/**","/api/images").permitAll()
                         .anyRequest().authenticated()
                 )
+
 
                 .formLogin(form -> form.disable())
 
