@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/ws/**").permitAll() // WebSocket 전체 경로 인증 제외
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                        .requestMatchers("/api/members/**", "/api/login", "/api/signup", "/api/logout", "/search/**","/api/images").permitAll()
+                        .requestMatchers("/api/members/**", "/api/login", "/api/signup", "/api/logout", "/search/**","/api/images","/api/chat/rooms/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
